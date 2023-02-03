@@ -54,7 +54,7 @@ for(let i = 0; i < args.length; i++) {
             echo_json = true;
             break;
         default:
-            console.error(`Invalid option: ${args[i]}`);
+            console.error(`Invalid option: ${args[i]}, Args: ${args}`);
             process.exit(1);
     }
 }
