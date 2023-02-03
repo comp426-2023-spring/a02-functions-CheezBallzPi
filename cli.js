@@ -1,16 +1,12 @@
 #!/usr/bin/env node
 
 // Imports
-const moment = require("moment-timezone");
-
+import moment from "moment-timezone";
 // Collect arguments passed
 const [,, ...args] = process.argv
 
-let got_lat = false;
-let got_long = false;
-
-let lat = 0;
-let long = 0;
+let lat = NaN;
+let long = NaN;
 
 let day = 1;
 
@@ -31,17 +27,15 @@ for(let i = 0; i < args.length; i++) {
                 -d 0-6        Day to retrieve weather: 0 is today; defaults to 1.
                 -j            Echo pretty JSON from open-meteo API and exit.`
             );
-            return 0;
+            process.exit(0);
         case '-n':
         case '-s':
-            got_lat = true;
             lat = parseInt(args[i+1]);
             if(args[i] == '-s') lat = -lat;
             i++;
             break;
         case '-e':
         case '-w':
-            got_long = true;
             long = parseInt(args[i+1]);
             if(args[i] == '-w') long = -long;
             i++;
@@ -59,8 +53,19 @@ for(let i = 0; i < args.length; i++) {
             break;
         default:
             console.error(`Invalid option: ${args[i]}`);
-            return 1;
+            process.exit(1);
     }
 }
 
-console.log(lat, long, timezone, day);
+const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${long}&daily=precipitation_sum&timezone=${timezone}`
+
+fetch(url)
+    .then((response) => response.json())
+    .then((data) => {
+        if(echo_json) {
+            console.log(data);
+        } else {
+            let precip = data.daily.precipitation_sum;
+            console.log(`You ${precip[day] > 0 ? "might" : "will not"} need your galoshes ${day == 0 ? "today" : (day == 1 ? "tomorrow" : `in ${day} days`)}.`)
+        }
+    });
