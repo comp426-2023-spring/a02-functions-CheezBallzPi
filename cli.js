@@ -2,6 +2,8 @@
 
 // Imports
 import moment from "moment-timezone";
+import fetch from "node-fetch";
+
 // Collect arguments passed
 const [,, ...args] = process.argv
 
